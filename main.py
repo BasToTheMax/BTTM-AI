@@ -37,8 +37,7 @@ demo = gr.Interface(
     outputs=gr.Image(shape=[512,512], type="pil", elem_id="output_image"),
     css="#output_image{width: 512px; height: 512px}",
     title="Retslav -  Text To Image - Stable Diffusion",
-    description="Retslav Stable Diffussion",
-    share=True
+    description="Retslav Stable Diffussion"
 )
 
-demo.launch(server_port=3000)
+demo.launch(server_port=3000, share=True)
