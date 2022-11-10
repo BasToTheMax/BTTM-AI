@@ -1,0 +1,17 @@
+[Unit]
+Description=BTTM AI
+After=nginx.service
+Requires=nginx.service
+
+[Service]
+User=root
+WorkingDirectory=/root/AI
+LimitNOFILE=4096
+ExecStart=/usr/local/bin/python3 main.py
+Restart=on-failure
+StartLimitInterval=180
+StartLimitBurst=30
+RestartSec=60s
+
+[Install]
+WantedBy=multi-user.target
