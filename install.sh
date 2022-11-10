@@ -13,5 +13,8 @@ servixe nginx restart
 pip3 install Pillow diffusers accelerate transformers gradio
 pip3 install torch torchvision torchaudio
 
+huggingface-cli login
+git config --global credential.helper store
+
 cp bttm.service /etc/systemd/system/bttm.service
 service bttm stop
