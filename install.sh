@@ -11,7 +11,7 @@ cp nginx-site.conf /etc/ngix/sites-enabled/default
 servixe nginx restart
 
 pip3 install Pillow diffusers accelerate transformers gradio
-pip3 install torch torchvision torchaudio
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 
 huggingface-cli login
 git config --global credential.helper store
