@@ -10,7 +10,7 @@ from PIL import Image
 print("Deps loaded!")
 
 model_id = "CompVis/stable-diffusion-v1-4"
-device = "cpu"
+device = "cuda"
 
 pipe = StableDiffusionPipeline.from_pretrained(model_id, use_auth_token=True)
 pipe = pipe.to(device)
@@ -21,7 +21,7 @@ def predict(name):
     print(f"Prompt: {name}")
     prompt = name
     with autocast("cuda"):
-        image = pipe(prompt, guidance_scale=7.5, width=384, height=384, num_inference_steps=20).images[0]
+        image = pipe(prompt, guidance_scale=7.5, width=512, height=512, num_inference_steps=50).images[0]
 
     # id = secrets.token_urlsafe(16)
     # image.save(f"./out/{id}.png")
