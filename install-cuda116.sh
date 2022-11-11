@@ -16,6 +16,7 @@ pip3 install torch torchvision torchaudio --extra-index-url https://download.pyt
 git config --global credential.helper store
 
 cp bttm.service /etc/systemd/system/bttm.service
+systemctl enable --now bttm
 service bttm stop
 
 huggingface-cli login
