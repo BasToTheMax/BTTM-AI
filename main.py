@@ -12,7 +12,7 @@ print("Deps loaded!")
 model_id = "prompthero/openjourney"
 device = "cuda"
 
-pipe = StableDiffusionPipeline.from_pretrained(model_id, use_auth_token=True, , torch_dtype=torch.float16)
+pipe = StableDiffusionPipeline.from_pretrained(model_id, use_auth_token=True, torch_dtype=torch.float16)
 pipe = pipe.to(device)
 
 print("Loaded!")
