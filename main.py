@@ -22,7 +22,7 @@ def predict(name):
     prompt = name
     with autocast("cuda"):
         pipe.enable_attention_slicing()
-        image = pipe(prompt, guidance_scale=7.5, width=512, height=512, num_inference_steps=50).images[0]
+        image = pipe(prompt, guidance_scale=7.5, width=512, height=512, num_inference_steps=30).images[0]
 
     # id = secrets.token_urlsafe(16)
     # image.save(f"./out/{id}.png")
