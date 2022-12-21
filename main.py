@@ -12,7 +12,7 @@ print("Deps loaded!")
 model_id = "prompthero/openjourney"
 device = "cuda"
 
-pipe = StableDiffusionPipeline.from_pretrained(model_id, use_auth_token=True)
+pipe = StableDiffusionPipeline.from_pretrained(model_id, use_auth_token=True, , torch_dtype=torch.float16)
 pipe = pipe.to(device)
 
 print("Loaded!")
@@ -21,6 +21,7 @@ def predict(name):
     print(f"Prompt: {name}")
     prompt = name
     with autocast("cuda"):
+        pipe.enable_attention_slicing()
         image = pipe(prompt, guidance_scale=7.5, width=512, height=512, num_inference_steps=50).images[0]
 
     # id = secrets.token_urlsafe(16)
