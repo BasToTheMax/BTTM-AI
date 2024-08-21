@@ -138,3 +138,11 @@ function messageUser(userID, message) {
         console.log('failed to dm user', e)
     }
 }
+
+
+const express = require('express');
+const app = express();
+
+app.use('/img', express.static(__dirname + '/img'));
+
+app.listen(process.env.PORT);
