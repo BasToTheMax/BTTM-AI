@@ -31,7 +31,6 @@ class CMD extends SlashCommand {
         });
 
         var pos = await queue.getJobCounts('wait');
-        console.log(pos);
         interaction.editReply(`**QUEUED**\nYour image has been prompt has been placed in the queue.\nJOB ID: ${job.id}\nPosition: ${pos.wait+1}`);
     }
 
