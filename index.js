@@ -48,28 +48,31 @@ client.on('ready', async () => {
     });
 
     events.on('active', ({ jobId, prev }) => {
-        console.log(`[Images] Job ${jobId} is now active; previous status was ${prev}`);
+        console.log(`[Images] ${jobId} ${prev} -> active`);
     });
 
 
     events.on('completed', async ({ jobId, returnvalue }) => {
-        console.log(`[Images] ${jobId} has completed and returned ${returnvalue}`, returnvalue);
+        console.log(`[Images] ${jobId} -> completed`, returnvalue);
 
-        var job = await q.getJob(jobId);
-        var data = job.data;
-
-        console.log('in', data);
+        var channelID = returnvalue.job.channelID;
+        try {
+            const channel = client.channels.cache.get(channelID);
+            channel.send(`<@${returnvalue.job.userID}> Image  ${jobId} completed!`);
+        } catch(e) {
+            console.log('Failed to post in channel!')
+        }
     });
 
     events.on('progress', async ({ jobId, returnvalue, mau }) => {
         // console.log(`[${name}] ${jobId} has progress and returned ${returnvalue}`, returnvalue, mau);
-        console.log('> ' + (await q.getJob(jobId)).progress);
+        console.log('> ' + (await client.imageQueue.getJob(jobId)).progress, returnvalue);
     });
 
     events.on('failed', async ({ jobId, failedReason }) => {
         console.log(`[Images] ${jobId} has failed with reason ${failedReason}`);
 
-        var job = await q.getJob(jobId);
+        var job = await client.imageQueue.getJob(jobId);
         var data = job.data;
 
         messageUser(data.userID, '> Image failed to generate :(')
