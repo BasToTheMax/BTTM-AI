@@ -58,7 +58,11 @@ client.on('ready', async () => {
         var channelID = returnvalue.job.channelID;
         try {
             const channel = client.channels.cache.get(channelID);
-            channel.send(`<@${returnvalue.job.userID}> Image  ${jobId} completed! ${returnvalue.res.url}`);
+            if (channel) {
+                channel.send(`<@${returnvalue.job.userID}> Image  ${jobId} completed! ${returnvalue.res.url}`);
+            } else {
+                messageUser(returnvalue.job.userID, `Image  ${jobId} completed! ${returnvalue.res.url}``);
+            }
         } catch(e) {
             console.log('Failed to post in channel!', e)
         }
