@@ -15,6 +15,8 @@
     "dotenv": "^16.4.5",
     "mongoose": "^8.5.3",
     "node-fetch": "^2.7.0",
+    "nodejs-file-downloader": "^4.13.0",
+    "sharp": "^0.33.5",
     "slashctrl": "^0.2.1"
   }
 }

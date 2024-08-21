@@ -5,8 +5,11 @@ const path = require('path');
 const dayjs = require('dayjs');
 const { log } = console;
 
-var relativeTime = require('dayjs/plugin/relativeTime')
+var relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime);
+
+const {Downloader} = require("nodejs-file-downloader");
+const sharp = require('sharp');
 
 var botToken = process.env.DISCORD_TOKEN;
 var applicationId = process.env.DISCORD_ID;
@@ -54,6 +57,16 @@ client.on('ready', async () => {
 
     events.on('completed', async ({ jobId, returnvalue }) => {
         console.log(`[Images] ${jobId} -> completed`, returnvalue);
+
+        const downloader = new Downloader({
+            url: returnvalue.res.url, //If the file name already exists, a new file with the name 200MB1.zip is created.
+            directory: "./img", //This folder will be created, if it doesn't exist.   
+            fileName: jobId + '.webp'
+        });
+
+        const dl = await downloader.download();
+
+        console.log(dl)
 
         var channelID = returnvalue.job.channelID;
         try {
