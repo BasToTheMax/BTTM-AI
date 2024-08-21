@@ -15,6 +15,9 @@ class CMD extends SlashCommand {
     }
     
     async execute(interaction) {
+        if (!interaction.channel) {
+            return interaction.reply('This command does not support DM, sorry.');
+        }
         var prompt = interaction.options.getString('prompt');
         // const db = require('../db');
         
