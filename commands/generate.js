@@ -26,7 +26,8 @@ class CMD extends SlashCommand {
 
         var job = await queue.add(`img-${interaction.user.id}-${Date.now()}`, {
             userID: interaction.user.id,
-            prompt
+            prompt,
+            channelID: interaction.channel.id
         });
 
         var pos = await queue.getJobCounts('wait');
