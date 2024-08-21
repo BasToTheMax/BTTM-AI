@@ -11,6 +11,8 @@ dayjs.extend(relativeTime);
 const {Downloader} = require("nodejs-file-downloader");
 const sharp = require('sharp');
 
+const fs = require('fs');
+
 var botToken = process.env.DISCORD_TOKEN;
 var applicationId = process.env.DISCORD_ID;
 
@@ -64,17 +66,30 @@ client.on('ready', async () => {
             fileName: jobId + '.webp'
         });
 
-        const dl = await downloader.download();
+        const { filePath } = await downloader.download();
 
-        console.log(dl)
+        await sharp(filePath).toFile(`./img/${jobId}.png`);
+
+        fs.rmSync(filePath);
+
+        var img = new db.Image({
+            userID: returnvalue.job.userID,
+            prompt: returnvalue.job.prompt
+        });
+        await img.save();
+
+        fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
+
+        var url = `http://n1.meegie.net:3104/img/${img._id}.png`;
+        var msg = ` Image ${jobId}-${img._id} (\`${img.prompt}\`) completed! ${url}`;
 
         var channelID = returnvalue.job.channelID;
         try {
             const channel = client.channels.cache.get(channelID);
             if (channel) {
-                channel.send(`<@${returnvalue.job.userID}> Image  ${jobId} completed! ${returnvalue.res.url}`);
+                channel.send(`<@${returnvalue.job.userID}> ${msg}`);
             } else {
-                messageUser(returnvalue.job.userID, `Image  ${jobId} completed! ${returnvalue.res.url}`);
+                messageUser(returnvalue.job.userID, msg);
             }
         } catch(e) {
             console.log('Failed to post in channel!', e)

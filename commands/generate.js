@@ -20,6 +20,10 @@ class CMD extends SlashCommand {
         }
         var prompt = interaction.options.getString('prompt');
         // const db = require('../db');
+
+        while (String(prompt).includes('@')) {
+            prompt = String(prompt).replace('@', '');
+        }
         
         await interaction.deferReply();
 
