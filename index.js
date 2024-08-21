@@ -57,6 +57,8 @@ client.on('ready', async () => {
 
         var job = await q.getJob(jobId);
         var data = job.data;
+
+        console.log('in', data);
     });
 
     events.on('progress', async ({ jobId, returnvalue, mau }) => {
