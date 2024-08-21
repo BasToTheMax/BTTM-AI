@@ -41,6 +41,38 @@ client.on('ready', async () => {
     };
 
     client.imageQueue = new BullMQ.Queue('images', queueOptions);
+    const events = new BullMQ.QueueEvents('images', queueOptions);
+
+    events.on('waiting', ({ jobId }) => {
+        console.log(`[Images] A job with ID ${jobId} is waiting`);
+    });
+
+    events.on('active', ({ jobId, prev }) => {
+        console.log(`[Images] Job ${jobId} is now active; previous status was ${prev}`);
+    });
+
+
+    events.on('completed', async ({ jobId, returnvalue }) => {
+        console.log(`[Images] ${jobId} has completed and returned ${returnvalue}`, returnvalue);
+
+        var job = await q.getJob(jobId);
+        var data = job.data;
+    });
+
+    events.on('progress', async ({ jobId, returnvalue, mau }) => {
+        // console.log(`[${name}] ${jobId} has progress and returned ${returnvalue}`, returnvalue, mau);
+        console.log('> ' + (await q.getJob(jobId)).progress);
+    });
+
+    events.on('failed', async ({ jobId, failedReason }) => {
+        console.log(`[Images] ${jobId} has failed with reason ${failedReason}`);
+
+        var job = await q.getJob(jobId);
+        var data = job.data;
+
+        messageUser(data.userID, '> Image failed to generate :(')
+
+    });
 
     updateStatus();
     setInterval(updateStatus, 5 * 60 * 1000)
@@ -61,80 +93,6 @@ client.on('interactionCreate', async interaction => {
 
 
 client.login(botToken);
-
-function createEvents(name, queueOptions, q, code) {
-    const events = new BullMQ.QueueEvents(name, queueOptions);
-
-    client.createQueue[code].events = events;
-
-    events.on('waiting', ({ jobId }) => {
-        // console.log(`[${name}] A job with ID ${jobId} is waiting`);
-    });
-
-    events.on('active', ({ jobId, prev }) => {
-        // console.log(`[${name}] Job ${jobId} is now active; previous status was ${prev}`);
-    });
-
-    events.on('completed', async ({ jobId, returnvalue }) => {
-        console.log(`[${name}] ${jobId} has completed and returned ${returnvalue}`, returnvalue);
-
-        var job = await q.getJob(jobId);
-        var data = job.data;
-
-        if (returnvalue.ok == true) {
-            try {
-                var userID = data.userID;
-
-                var db = require('./db');
-                var VPS = await db.VPS.findOne({
-                    _id: returnvalue.vpsID
-                });
-                if (!VPS) return console.log('VPS NOT FOUND?!!?!?111');
-                VPS.proxID = returnvalue.proxID;
-                VPS.state = 'created';
-                VPS.expiry = dayjs().add(3, 'day');
-                await VPS.save();
-
-                var conn = '';
-
-                conn += '```bash\n';
-                conn += `ssh root@${VPS.nodeIP} -p ${VPS.sshPort}`
-                conn += '\n```';
-
-                client.users.send(userID, `> **VPS Created!**\n> \t\tHello. Your vps has been created!\n> This message will contain the details of your vps.\n\n> VPS ID: \`${VPS.shortID}\`\n> VPS IP (NAT/shared): ${VPS.nodeIP}\n> SSH Port: ${VPS.sshPort}\n> Username: root\n> Password: ||\`${VPS.password}\`||\n\n> Connect to your vps by executing this in a terminal:\n${conn}\n\nIf you want to forward a port, use the /forward command.`);
-
-            } catch (e) {
-                console.log(`> Failed to send ${data.userID} a DM: ${String(e)}`);
-            }
-        } else {
-            try {
-                var userID = data.userID;
-                console.log('r', returnvalue)
-                client.users.send(userID, `> **Create failed :x:!**\n> \t\tHello. Your vps has failed to create :(`);
-            } catch (e) { }
-        }
-    });
-
-    events.on('progress', async ({ jobId, returnvalue, mau }) => {
-        // console.log(`[${name}] ${jobId} has progress and returned ${returnvalue}`, returnvalue, mau);
-        console.log('> ' + (await q.getJob(jobId)).progress);
-    });
-
-    events.on('failed', async ({ jobId, failedReason }) => {
-        console.log(`[${name}] ${jobId} has failed with reason ${failedReason}`);
-
-        var job = await q.getJob(jobId);
-        var data = job.data;
-
-        try {
-            client.users.send(data.userID, `> VPS Failed to create :(`);
-        } catch (e) {
-            console.log(`> Failed to send ${data.userID} a DM: ${String(e)}`);
-        }
-    });
-
-
-}
 
 function messageUser(userID, message) {
     try {
