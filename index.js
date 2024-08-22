@@ -84,7 +84,7 @@ client.on('ready', async () => {
 
         fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
 
-        var url = `http://n1.meegie.net:3104/img/${token}/${img._id}.png`;
+        var url = `http://n1.meegie.net:3104/img/${token}/${img._id}`;
         var msg = ` Image ${jobId}-${img._id} (\`${img.prompt}\`) completed! ${url}`;
 
         var channelID = returnvalue.job.channelID;
