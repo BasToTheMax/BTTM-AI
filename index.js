@@ -72,15 +72,18 @@ client.on('ready', async () => {
 
         fs.rmSync(filePath);
 
+        var token = Date.now();
+
         var img = new db.Image({
             userID: returnvalue.job.userID,
-            prompt: returnvalue.job.prompt
+            prompt: returnvalue.job.prompt,
+            token
         });
         await img.save();
 
         fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
 
-        var url = `http://n1.meegie.net:3104/img/${img._id}.png`;
+        var url = `http://n1.meegie.net:3104/img/${token}/${img._id}.png`;
         var msg = ` Image ${jobId}-${img._id} (\`${img.prompt}\`) completed! ${url}`;
 
         var channelID = returnvalue.job.channelID;
@@ -143,6 +146,25 @@ function messageUser(userID, message) {
 const express = require('express');
 const app = express();
 
-app.use('/img', express.static(__dirname + '/img'));
+app.set('view engine', 'ejs');
+
+// app.use('/img', express.static(__dirname + '/img'));
+app.get('/img/:token/:id', async (req, res) => {
+    var { id, token } = req.params;
+    
+    var item = await db.Image.findOne({
+        _id: id
+    });
+    if (!item) return res.status(404).send('Image not found');
+
+    if (token != item.token && item.token) {
+        return res.status(401).send('Invalid token');
+    }
+
+    return res.sendFile(__dirname + '/img/' + id + '.png');
+})
+app.get('/', (req, res) => {
+    res.render('index');
+});
 
 app.listen(process.env.PORT);
