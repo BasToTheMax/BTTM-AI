@@ -35,6 +35,11 @@ class CMD extends SlashCommand {
             userID: interaction.user.id,
             prompt,
             channelID: interaction.channel.id
+        }, {
+            attempts: 5,
+            backoff: (attempts) => {
+                return 1000*60*15*attempts;
+            }
         });
 
         var pos = await queue.getJobCounts('wait');

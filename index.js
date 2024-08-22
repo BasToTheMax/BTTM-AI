@@ -42,15 +42,7 @@ client.on('ready', async () => {
             retryStrategy(times) {
                 return 1000;
             },
-        },
-
-        defaultJobOptions: {
-            attempts: 3,
-            backoff: {
-              type: 'exponential',
-              delay: 1000*60*10,
-            },
-        },
+        }
     };
 
     client.imageQueue = new BullMQ.Queue('images', queueOptions);
