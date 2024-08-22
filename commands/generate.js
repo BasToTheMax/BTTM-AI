@@ -37,10 +37,11 @@ class CMD extends SlashCommand {
             channelID: interaction.channel.id
         }, {
             attempts: 5,
-            backoff: (attempts) => {
-                return 1000*60*15*attempts;
-            }
-        });
+            backoff: {
+		      type: 'exponential',
+		      delay: 1000*60*15,
+		},
+        });//1000*60*15*attempts
 
         var pos = await queue.getJobCounts('wait');
         interaction.editReply(`**QUEUED**\nYour image has been prompt has been placed in the queue.\nJOB ID: ${job.id}\nPosition: ${pos.wait+1}`);
