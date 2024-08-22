@@ -73,6 +73,7 @@ client.on('ready', async () => {
         fs.rmSync(filePath);
 
         var token = Date.now();
+        token = String(token);
 
         var img = new db.Image({
             userID: returnvalue.job.userID,
