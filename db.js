@@ -10,7 +10,9 @@ mongoose.connect(process.env.MONGO_URL);
 const Image = mongoose.model('Image', {
     userID: String,
     prompt: String,
-    token: String
+    token: String,
+    imageID: String,
+    url: String
 });
 
 module.exports = {

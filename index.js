@@ -5,6 +5,8 @@ const path = require('path');
 const dayjs = require('dayjs');
 const { log } = console;
 
+const fetch = require('node-fetch');
+
 var relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime);
 
@@ -82,9 +84,17 @@ client.on('ready', async () => {
         });
         await img.save();
 
+        var adURL = await fetch(`http://adfoc.us/api/?key=${process.env.FOCUS}&url=${process.env.BASE}/img/${token}/${img._id}`).then(r => r.text());
+
+        console.log(adURL);
+
+        img.url = adURL;
+        img.imageID = img._id;
+        await img.save();
+
         fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
 
-        var url = `http://n1.meegie.net:3104/img/${token}/${img._id}`;
+        var url = `${process.env.BASE}/img/${img.imageID}`;
         var msg = ` Image ${jobId}-${img._id} (\`${img.prompt}\`) completed! ${url}`;
 
         var channelID = returnvalue.job.channelID;
@@ -167,5 +177,31 @@ app.get('/img/:token/:id', async (req, res) => {
 app.get('/', (req, res) => {
     res.render('index');
 });
+
+app.get('/img/:id', async (req, res) => {
+    const { id } = req.params;
+
+    var img = await db.Image.findOne({
+        imageID: id
+    });
+
+    if (!img) return res.send('Invalid image');
+
+    res.render('image', { img });
+});
+
+app.get('/img/:token/:id', async (req, res) => {
+    const { id, token } = req.params;
+
+    var img = await db.Image.findOne({
+        imageID: id,
+        token
+    });
+
+    if (!img) return res.send('Invalid image or token');
+
+    res.render('view', { img });
+});
+
 
 app.listen(process.env.PORT);

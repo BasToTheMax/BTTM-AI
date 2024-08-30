@@ -25,9 +25,8 @@
 <body>
     <div class="main">
         <h1>Prompt: <%= img.prompt %></h1>
-
-        Image hidden. Watch ad to see:
-        <a href="<%= img.url %>">Open image</a>
+        
+        <img src="/ai/<%= img.token %>/<%= img.imageID %>" />
 
         <br /><br />
 
