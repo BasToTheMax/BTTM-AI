@@ -160,7 +160,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 // app.use('/img', express.static(__dirname + '/img'));
-app.get('/img/:token/:id', async (req, res) => {
+app.get('/ai/:token/:id', async (req, res) => {
     var { id, token } = req.params;
     
     var item = await db.Image.findOne({
