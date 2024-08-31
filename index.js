@@ -71,6 +71,7 @@ client.on('ready', async () => {
         const { filePath } = await downloader.download();
 
         await sharp(filePath).toFile(`./img/${jobId}.png`);
+        var thumb = await sharp(filePath).resize(128, 128).png().toBuffer();
 
         fs.rmSync(filePath);
 
@@ -95,13 +96,13 @@ client.on('ready', async () => {
         fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
 
         var url = `${process.env.BASE}/img/${img.imageID}`;
-        var msg = ` Image ${jobId}-${img._id} (\`${img.prompt}\`) completed! ${url}`;
+        var msg = ` Your image ${jobId}-${img._id} (\`${img.prompt}\`) completed!\nA preview of the result has been attached. To see the full image, visit the following url: ${url}`;
 
         var channelID = returnvalue.job.channelID;
         try {
             const channel = client.channels.cache.get(channelID);
             if (channel) {
-                channel.send(`<@${returnvalue.job.userID}> ${msg}`);
+                channel.send({ content: `<@${returnvalue.job.userID}>, ${msg}`, files: [thumb] });
             } else {
                 messageUser(returnvalue.job.userID, msg);
             }
