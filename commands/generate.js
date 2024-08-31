@@ -31,6 +31,8 @@ class CMD extends SlashCommand {
 
         await interaction.editReply('Adding to queue...');
 
+        var pos = await queue.getJobCounts('wait');
+
         var job = await queue.add(`img-${interaction.user.id}-${Date.now()}`, {
             userID: interaction.user.id,
             prompt,
@@ -43,7 +45,6 @@ class CMD extends SlashCommand {
 		},
         });//1000*60*15*attempts
 
-        var pos = await queue.getJobCounts('wait');
         interaction.editReply(`**QUEUED**\nYour image has been prompt has been placed in the queue.\nJOB ID: ${job.id}\nPosition: ${pos.wait+1}`);
     }
 
