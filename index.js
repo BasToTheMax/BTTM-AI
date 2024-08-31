@@ -96,7 +96,7 @@ client.on('ready', async () => {
         fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
 
         var url = `${process.env.BASE}/img/${img.imageID}`;
-        var msg = ` Your image ${jobId}-${img._id} (\`${img.prompt}\`) completed!\nA preview of the result has been attached. To see the full image, visit the following url: ${url}`;
+        var msg = ` Your image ${jobId}-${img._id} (\`${img.prompt}\`) completed!\nA preview of the result has been attached. To see the full image, visit the following url: ${url}\n\nGeneration took: ${returnvalue.time}s (${Math.floor(returnvalue.time/60)}m)`;
 
         var channelID = returnvalue.job.channelID;
         try {
