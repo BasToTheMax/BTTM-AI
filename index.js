@@ -63,15 +63,15 @@ client.on('ready', async () => {
         try {
             console.log(`[Images] ${jobId} -> completed`, returnvalue);
 
-            const downloader = new Downloader({
-                url: returnvalue.res.url, //If the file name already exists, a new file with the name 200MB1.zip is created.
-                directory: "./img", //This folder will be created, if it doesn't exist.   
-                fileName: jobId + '.webp'
-            });
+            // const downloader = new Downloader({
+            //     url: returnvalue.res.url, //If the file name already exists, a new file with the name 200MB1.zip is created.
+            //     directory: "./img", //This folder will be created, if it doesn't exist.   
+            //     fileName: jobId + '.webp'
+            // });
 
-            const { filePath } = await downloader.download();
+            // const { filePath } = await downloader.download();
 
-            await sharp(filePath).toFile(`./img/${jobId}.png`);
+            await sharp(returnvalue.image).toFile(`./img/${jobId}.png`);
             var thumb = await sharp(filePath).resize(128, 128).png().toBuffer();
 
             fs.rmSync(filePath);
