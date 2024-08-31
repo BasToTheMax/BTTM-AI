@@ -131,7 +131,7 @@ client.on('ready', async () => {
     });
 
     events.on('failed', async ({ jobId, failedReason }) => {
-        console.log(`[Images] ${jobId} has failed with reason ${failedReason}`);
+        console.log(`[Images] ${jobId} has failed with reason ${failedReason}`, failedReason);
 
         var job = await client.imageQueue.getJob(jobId);
         var data = job.data;
