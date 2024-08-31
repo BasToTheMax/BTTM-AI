@@ -10,7 +10,7 @@ const fetch = require('node-fetch');
 var relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime);
 
-const {Downloader} = require("nodejs-file-downloader");
+const { Downloader } = require("nodejs-file-downloader");
 const sharp = require('sharp');
 
 const fs = require('fs');
@@ -60,54 +60,68 @@ client.on('ready', async () => {
 
 
     events.on('completed', async ({ jobId, returnvalue }) => {
-        console.log(`[Images] ${jobId} -> completed`, returnvalue);
-
-        const downloader = new Downloader({
-            url: returnvalue.res.url, //If the file name already exists, a new file with the name 200MB1.zip is created.
-            directory: "./img", //This folder will be created, if it doesn't exist.   
-            fileName: jobId + '.webp'
-        });
-
-        const { filePath } = await downloader.download();
-
-        await sharp(filePath).toFile(`./img/${jobId}.png`);
-        var thumb = await sharp(filePath).resize(128, 128).png().toBuffer();
-
-        fs.rmSync(filePath);
-
-        var token = Date.now();
-        token = String(token);
-
-        var img = new db.Image({
-            userID: returnvalue.job.userID,
-            prompt: returnvalue.job.prompt,
-            token
-        });
-        await img.save();
-
-        var adURL = await fetch(`http://adfoc.us/api/?key=${process.env.FOCUS}&url=${process.env.BASE}/img/${token}/${img._id}`).then(r => r.text());
-
-        console.log(adURL);
-
-        img.url = adURL;
-        img.imageID = img._id;
-        await img.save();
-
-        fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
-
-        var url = `${process.env.BASE}/img/${img.imageID}`;
-        var msg = ` Your image ${jobId}-${img._id} (\`${img.prompt}\`) completed!\nA preview of the result has been attached. To see the full image, visit the following url: ${url}\n\nGeneration took: ${returnvalue.time}s (${Math.floor(returnvalue.time/60)}m)`;
-
-        var channelID = returnvalue.job.channelID;
         try {
-            const channel = client.channels.cache.get(channelID);
-            if (channel) {
-                channel.send({ content: `<@${returnvalue.job.userID}>, ${msg}`, files: [thumb] });
-            } else {
-                messageUser(returnvalue.job.userID, msg);
+            console.log(`[Images] ${jobId} -> completed`, returnvalue);
+
+            const downloader = new Downloader({
+                url: returnvalue.res.url, //If the file name already exists, a new file with the name 200MB1.zip is created.
+                directory: "./img", //This folder will be created, if it doesn't exist.   
+                fileName: jobId + '.webp'
+            });
+
+            const { filePath } = await downloader.download();
+
+            await sharp(filePath).toFile(`./img/${jobId}.png`);
+            var thumb = await sharp(filePath).resize(128, 128).png().toBuffer();
+
+            fs.rmSync(filePath);
+
+            var token = Date.now();
+            token = String(token);
+
+            var img = new db.Image({
+                userID: returnvalue.job.userID,
+                prompt: returnvalue.job.prompt,
+                token
+            });
+            await img.save();
+
+            var adURL = await fetch(`http://adfoc.us/api/?key=${process.env.FOCUS}&url=${process.env.BASE}/img/${token}/${img._id}`).then(r => r.text());
+
+            console.log(adURL);
+
+            img.url = adURL;
+            img.imageID = img._id;
+            await img.save();
+
+            fs.renameSync(`./img/${jobId}.png`, `./img/${img._id}.png`);
+
+            var url = `${process.env.BASE}/img/${img.imageID}`;
+            var msg = ` Your image ${jobId}-${img._id} (\`${img.prompt}\`) completed!\nA preview of the result has been attached. To see the full image, visit the following url: ${url}\n\nGeneration took: ${returnvalue.time}s (${Math.floor(returnvalue.time / 60)}m)`;
+
+            var channelID = returnvalue.job.channelID;
+            try {
+                const channel = client.channels.cache.get(channelID);
+                if (channel) {
+                    channel.send({ content: `<@${returnvalue.job.userID}>, ${msg}`, files: [thumb] });
+                } else {
+                    messageUser(returnvalue.job.userID, msg);
+                }
+            } catch (e) {
+                console.log('Failed to post in channel!', e)
             }
-        } catch(e) {
-            console.log('Failed to post in channel!', e)
+        } catch (e) {
+            var channelID = returnvalue.job.channelID;
+            try {
+                const channel = client.channels.cache.get(channelID);
+                if (channel) {
+                    channel.send({ content: `<@${returnvalue.job.userID}>, Error generating image: ${String(e)}` });
+                } else {
+                    messageUser(returnvalue.job.userID, msg);
+                }
+            } catch (e) {
+                console.log('Failed to post in channel!', e)
+            }
         }
     });
 
@@ -139,7 +153,7 @@ client.on('interactionCreate', async interaction => {
     console.log(`> ${interaction.user.username} -> /${interaction.commandName}`);
 
     interaction.log = client.channels.cache.get(process.env.CH_LOG);
-    
+
     slashCtrl.handleCommands(interaction);
 });
 
@@ -163,7 +177,7 @@ app.set('view engine', 'ejs');
 // app.use('/img', express.static(__dirname + '/img'));
 app.get('/ai/:token/:id', async (req, res) => {
     var { id, token } = req.params;
-    
+
     var item = await db.Image.findOne({
         _id: id
     });
